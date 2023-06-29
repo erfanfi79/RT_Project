@@ -1,7 +1,10 @@
 import csv
 import numpy as np
+import random
+import math
 
-def generate_random_periods_discrete(num_periods: int, num_sets: int, available_periods: list):
+def generate_random_periods_discrete(num_periods: int, num_sets: int, available_periods: list,
+                                     filename: str | None = 'discrete_periods.csv'):
     """
     Generate a matrix of (num_sets x num_periods) random periods chosen randomly in the list of available periods.
     Args:
@@ -15,14 +18,16 @@ def generate_random_periods_discrete(num_periods: int, num_sets: int, available_
         p = np.array(available_periods)
         periods = p[np.random.randint(len(p), size=(num_sets, num_periods))].tolist()
 
-    with open('discrete_periods.csv', 'w', newline='') as file:
-        writer = csv.writer(file)
-        for i, period_set in enumerate(periods):
-            writer.writerow([f'Period Set {i+1}'] + period_set)
+    if filename:
+        with open(filename, 'w', newline='') as file:
+            writer = csv.writer(file)
+            for i, period_set in enumerate(periods):
+                writer.writerow([f'Period Set {i + 1}'] + period_set)
 
     return periods
 
-def generate_uunifastdiscard(nsets: int, u: float, n: int, filename: str):
+
+def generate_uunifastdiscard(nsets: int, u: float, n: int, filename: str = None):
     """
     The UUniFast algorithm was proposed by Bini for generating task
     utilizations on uniprocessor architectures.
@@ -47,19 +52,20 @@ def generate_uunifastdiscard(nsets: int, u: float, n: int, filename: str):
             utilizations.append(sumU - nextSumU)
             sumU = nextSumU
         utilizations.append(sumU)
-        
+
         if all(ut <= 1 for ut in utilizations):
             sets.append(utilizations)
 
-    with open(filename, 'w', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(['Task ' + str(i) for i in range(1, n+1)])
-        for utilizations in sets:
-            writer.writerow(utilizations)
+    if filename:
+        with open(filename, 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(['Task ' + str(i) for i in range(1, n + 1)])
+            for utilizations in sets:
+                writer.writerow(utilizations)
 
     return sets
-    
-    
+
+
 def generate_tasksets(utilizations, periods, filename):
     """
     Take a list of task utilization sets and a list of task period sets and
@@ -74,15 +80,29 @@ def generate_tasksets(utilizations, periods, filename):
             [[(30.0, 100), (20.0, 50), (800.0, 1000)],
              [(20.0, 200), (450.0, 500), (5.0, 10)]]
     """
+
     def trunc(x, p):
         return int(x * 10 ** p) / float(10 ** p)
 
     result = [[(trunc(ui * pi, 6), trunc(pi, 6)) for ui, pi in zip(us, ps)]
               for us, ps in zip(utilizations, periods)]
 
-    with open(filename, 'w', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        for row in result:
-            writer.writerow(row)
+    if filename:
+        with open(filename, 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            for row in result:
+                writer.writerow(row)
 
     return result
+
+
+def generate_tasks(n, u_total, filename: str | None = None):
+    n_sets = math.ceil(u_total)
+    utilizations = generate_uunifastdiscard(nsets=n_sets, u=u_total, n=n, filename=None)
+    periods = generate_random_periods_discrete(num_periods=n, num_sets=n_sets, available_periods=[5, 10, 20], filename=None)
+    return generate_tasksets(utilizations, periods, filename=filename)
+
+
+if __name__ == '__main__':
+    tasks = generate_tasks(n=5, u_total=1)
+    print(tasks)

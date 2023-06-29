@@ -1,11 +1,11 @@
 from Task import Task
 from ElephantSearch import ESA_Scheduler
 from ArtificialBeeColony import ABC_Scheduler
-
+from task_generation import generate_tasks as generate_task
 
 def generate_tasks(num_tasks):
     # code to generate random tasks with given number of tasks
-    pass
+    return generate_task(n=num_tasks, u_total=1, filename=None)
 
 
 def read_tasks_from_file(file_path):
