@@ -3,6 +3,7 @@ import numpy as np
 import random
 import math
 
+
 def generate_random_periods_discrete(num_periods: int, num_sets: int, available_periods: list,
                                      filename: str | None = 'discrete_periods.csv'):
     """
@@ -99,7 +100,8 @@ def generate_tasksets(utilizations, periods, filename):
 def generate_tasks(n, u_total, filename: str | None = None):
     n_sets = math.ceil(u_total)
     utilizations = generate_uunifastdiscard(nsets=n_sets, u=u_total, n=n, filename=None)
-    periods = generate_random_periods_discrete(num_periods=n, num_sets=n_sets, available_periods=[5, 10, 20], filename=None)
+    periods = generate_random_periods_discrete(num_periods=n, num_sets=n_sets, available_periods=[5, 10, 20],
+                                               filename=None)
     return generate_tasksets(utilizations, periods, filename=filename)
 
 
