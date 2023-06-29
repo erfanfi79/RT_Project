@@ -3,7 +3,7 @@ import random
 from Scheduler import Scheduler
 
 
-class ES_Scheduler(Scheduler):
+class ESA_Scheduler(Scheduler):
     """
     A class representing the GA algorithm for task scheduling.
     """
@@ -125,4 +125,4 @@ class ES_Scheduler(Scheduler):
 
         """
 
-    pass
+        pass

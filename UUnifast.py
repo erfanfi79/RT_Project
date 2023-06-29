@@ -15,15 +15,15 @@ def uunifast(n, u_total):
     return utilizations
 
 
-def check_condition(utils):
+def check_condition(utils, core_num):
     for i in utils:
-        if i > 1:
+        if i > core_num:
             return False
     return True
 
 
-def get_uunifast(n, u, is_parallel):
+def get_uunifast(n, u, core_num):
     while True:
         utilizations = uunifast(n, u)
-        if is_parallel or check_condition(utilizations):
+        if core_num > 1 or check_condition(utilizations, core_num):
             return utilizations

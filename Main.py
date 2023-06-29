@@ -1,6 +1,6 @@
 from Task import Task
-from ElephantSearch import ES_Scheduler
-from ArtificialBeeColony import AB_Scheduler
+from ElephantSearch import ESA_Scheduler
+from ArtificialBeeColony import ABC_Scheduler
 
 
 def generate_tasks(num_tasks):

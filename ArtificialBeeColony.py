@@ -3,7 +3,7 @@ import random
 from Scheduler import Scheduler
 
 
-class AB_Scheduler(Scheduler):
+class ABC_Scheduler(Scheduler):
     """
     A class representing the GA algorithm for task scheduling.
     """
