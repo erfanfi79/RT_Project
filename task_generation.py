@@ -2,6 +2,7 @@ import csv
 import numpy as np
 import random
 import math
+from Task import Task
 
 
 def generate_random_periods_discrete(num_periods: int, num_sets: int, available_periods: list,
@@ -129,6 +130,27 @@ def generate_tasks(n, u_total, filename: str | None = None):
     )
 
 
+def generate_tasks_instances(n, u_total, filename: str | None = None):
+    periodic_tasks = generate_tasks(n=n, u_total=u_total, filename=filename)
+    flatten_p_tasks = [task for task_set in periodic_tasks for task in task_set]
+    hyper_period = math.lcm(*[int(p_task[1]) for p_task in flatten_p_tasks])
+
+    instances = []
+    for p_task_idx, p_task in enumerate(sorted(flatten_p_tasks, key=lambda x: x[1])):
+        number_of_occurrences = int(hyper_period / p_task[1])
+        for i in range(number_of_occurrences):
+            instance = Task(
+                id=f"{p_task_idx + 1}_{i + 1}",
+                arrival_time=i * p_task[1],
+                deadline=(i + 1) * p_task[1],
+                execution_time=p_task[0]
+            )
+
+            instances.append(instance)
+
+    return instances, hyper_period
+
+
 if __name__ == '__main__':
-    tasks = generate_tasks(n=5, u_total=1)
-    print(tasks)
+    task_instances, hyper_period = generate_tasks_instances(n=2, u_total=1, filename=None)
+    print(len(task_instances))
