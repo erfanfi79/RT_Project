@@ -73,7 +73,7 @@ def generate_tasksets(utilizations, periods, filename):
     return a list of couples (c, p) sets. The computation times are truncated
     at a precision of 10^-10 to avoid floating point precision errors.
     Args:
-        -   utilizations : The list of task utilization sets. 
+        -   utilizations : The list of task utilization sets.
         -   periods : The list of task period sets.
         -   filename : The name of the CSV file to save the results in.
     Returns:
@@ -98,11 +98,35 @@ def generate_tasksets(utilizations, periods, filename):
 
 
 def generate_tasks(n, u_total, filename: str | None = None):
+    """
+    return a list of couples (c, p) sets. The computation times are truncated
+    at a precision of 10^-10 to avoid floating point precision errors.
+    Returns:
+        For the above example, it returns:
+            [[(30.0, 100), (20.0, 50), (800.0, 1000)],
+             [(20.0, 200), (450.0, 500), (5.0, 10)]]
+    """
     n_sets = math.ceil(u_total)
-    utilizations = generate_uunifastdiscard(nsets=n_sets, u=u_total, n=n, filename=None)
-    periods = generate_random_periods_discrete(num_periods=n, num_sets=n_sets, available_periods=[5, 10, 20],
-                                               filename=None)
-    return generate_tasksets(utilizations, periods, filename=filename)
+
+    utilizations = generate_uunifastdiscard(
+        nsets=n_sets,
+        u=u_total,
+        n=n,
+        filename=None
+    )
+
+    periods = generate_random_periods_discrete(
+        num_periods=n,
+        num_sets=n_sets,
+        available_periods=[x for x in range(10, 101)],
+        filename=None
+    )
+
+    return generate_tasksets(
+        utilizations=utilizations,
+        periods=periods,
+        filename=filename
+    )
 
 
 if __name__ == '__main__':
