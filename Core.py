@@ -1,5 +1,12 @@
 import random
 from Task import Task
+from enum import Enum
+
+
+class MappingType(Enum):
+    FIRST_FIT = 1
+    WORST_FIT = 2
+    BEST_FIT = 3
 
 
 class Core:
@@ -68,12 +75,14 @@ class Core:
         # Randomly initialize a solution (core assignment)
         return random.sample(self.assigned_tasks, len(self.assigned_tasks))
 
-def worst_fit(task_queue,num_cores):
+
+def worst_fit(task_queue, num_cores):
     cores = [[] for i in range(num_cores)]
     for task in task_queue:
         worst_core = max(cores, key=lambda core: sum([t.execution_time for t in core] + [task['execution_time']]))
         worst_core.append(task)
     return cores
+
 
 def main():
     # Example usage
@@ -90,18 +99,15 @@ def main():
         Core(3)
     ]
 
-    total_deadline = max([task.deadline for task in tasks])
+    hyper_period = max([task.deadline for task in tasks])
+    mapping_type = MappingType.FIRST_FIT
 
-    # Assign tasks to cores using the first fit algorithm
-    for task in tasks:
-        assigned = False
-        for core in cores:
-            if core.calculate_free_time(task.arrival_time, total_deadline) >= task.execution_time:
-                core.assign_task(task)
-                assigned = True
-                break
-        if not assigned:
-            print("No available core for task:", task.id)
+    if mapping_type == MappingType.FIRST_FIT:
+        assign_by_first_fit(cores, tasks, hyper_period)
+    elif mapping_type == MappingType.BEST_FIT:
+        assign_by_best_fit(cores, tasks, hyper_period)
+    elif mapping_type == MappingType.WORST_FIT:
+        assign_by_worst_fit(cores, tasks, hyper_period)
 
     # Schedule tasks on each core using the Artificial Bee Colony algorithm
     for core in cores:
@@ -110,6 +116,48 @@ def main():
     # Print the assignments for each core
     for core in cores:
         print("Core", core.core_id, "assigned tasks:", [task.id for task in core.assigned_tasks])
+
+
+def assign_by_first_fit(cores, tasks, hyper_period):
+    # Assign tasks to cores using the first fit algorithm
+    for task in tasks:
+        assigned = False
+        for core in cores:
+            if core.calculate_free_time(task.arrival_time, hyper_period) >= task.execution_time:
+                core.assign_task(task)
+                assigned = True
+                break
+        if not assigned:
+            print("No available core for task:", task.id)
+
+
+def assign_by_best_fit(cores, tasks, hyper_period):
+    # Assign tasks to cores using the best fit algorithm
+    for task in tasks:
+        utilizations = [(core, core.calculate_free_time(task.arrival_time, hyper_period)) for core in cores]
+
+        assigned = False
+        for core, free_time in sorted(utilizations, key=lambda x: x[1]):
+            if free_time >= task.execution_time:
+                core.assign_task(task)
+                assigned = True
+                break
+
+        if not assigned:
+            print("No available core for task:", task.id)
+
+
+def assign_by_worst_fit(cores, tasks, hyper_period):
+    # Assign tasks to cores using the worst fit algorithm
+    for task in tasks:
+        utilizations = [(core, core.calculate_free_time(task.arrival_time, hyper_period)) for core in cores]
+
+        for core, free_time in sorted(utilizations, key=lambda x: x[1], reverse=True):
+            if free_time >= task.execution_time:
+                core.assign_task(task)
+                break
+            print("No available core for task:", task.id)
+            break
 
 
 if __name__ == '__main__':
