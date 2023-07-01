@@ -1,23 +1,31 @@
+import enum
+
 from Task import Task
 from ElephantSearch import ESA_Scheduler
 from ArtificialBeeColony import ABC_Scheduler
-from task_generation import generate_tasks as generate_task
-
-def generate_tasks(num_tasks):
-    # code to generate random tasks with given number of tasks
-    return generate_task(n=num_tasks, u_total=1, filename=None)
+from Core import Core
+from task_generation import generate_tasks_instances
 
 
-def read_tasks_from_file(file_path):
-    # code to read tasks from file and create Task objects
+class CoreAssignType(enum.Enum):
+    WF = "worst fit"
+    BF = "best fit"
+    FT = "first fit"
+
+
+class SchedulingType(enum.Enum):
+    ABC = "Artificial bee colony"
+    ESA = "Elephant search algorithm"
+
+
+def assign_to_cores(cores, task_instances, assign_type):
     pass
 
 
-def write_results_to_file(results):
-    # code to write results to JSON file
-    pass
-
-
-def plot_results(num_tasks_list, ga_results, improved_ga_results):
-    # code to plot bar chart of average times for different number of tasks for both algorithms
-    pass
+def make_multicore_scheduling(num_cores, core_type, u_total, scheduling_type):
+    cores = [Core(i) for i in range(num_cores)]
+    task_instances, hyper_period = generate_tasks_instances(2, u_total=u_total)
+    assign_to_cores(cores, task_instances, core_type)
+    if scheduling_type == SchedulingType.ABC:
+        ABC = ABC_Scheduler()
+        ABC.run()

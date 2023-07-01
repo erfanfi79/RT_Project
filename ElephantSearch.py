@@ -3,126 +3,82 @@ import random
 from Scheduler import Scheduler
 
 
-class ESA_Scheduler(Scheduler):
+class ESA_Scheduler:
     """
     A class representing the GA algorithm for task scheduling.
     """
 
-    def __init__(self, num_tasks, mutation_rate, crossover_rate, max_iter):
+    def __init__(self, n_tasks, n_elephants, n_r, n_iters):
+        self.n_tasks = n_tasks
+        self.n_elephants = n_elephants
+        self.n_r = n_r
+        self.n_iters = n_iters
+        self.population = self.initialize_population()
 
-        self.pop_size = num_tasks
-        self.mutation_rate = mutation_rate
-        self.crossover_rate = crossover_rate
-        self.max_iter = max_iter
-        super().__init__(num_tasks, mutation_rate, crossover_rate, max_iter)
-
-    def initialize_population(self, num_tasks):
-        """
-        Initializes the population with random task orders.
-
-        Args:
-            num_tasks (int): Number of tasks.
-
-        Returns:
-            list: A list of task orders (chromosomes).
-        """
+    def initialize_population(self):
         population = []
-        for i in range(self.pop_size):
-            chromosome = [j for j in range(num_tasks)]
-            random.shuffle(chromosome)
-            population.append(chromosome)
+        for i in range(self.n_elephants):
+            schedule = list(range(self.n_tasks))
+            random.shuffle(schedule)
+            population.append(schedule)
         return population
 
-    def calculate_fitness(self, population, tasks):
-        """
-        Calculates the fitness of each chromosome in the population.
+    def calculate_cost(self, schedule, task_list):
+        return 0
 
-        Args:
-            population (list): A list of task orders (chromosomes).
-            tasks (list): A list of Task objects.
+    def generate_random_solution(self, n_tasks):
+        schedule = list(range(n_tasks))
+        random.shuffle(schedule)
+        return schedule
 
-        Returns:
-            list: A list of tuples containing the chromosome and its fitness.
-        """
-        fitness_scores = []
-        for chromosome in population:
-            full_time, final_time, wait_time, resp_time, slack_time = self.evaluate(chromosome, tasks)
-            fitness = 1 / (1 + slack_time)
-            fitness_scores.append((chromosome, fitness))
-        return fitness_scores
+    def mutate_schedule(self, schedule, tasks):
+        new_schedule = schedule.copy()
+        i, j = random.sample(range(len(schedule)), 2)
+        new_schedule[i], new_schedule[j] = new_schedule[j], new_schedule[i]
+        return new_schedule
 
-    def evaluate(self, chromosome, tasks):
-        """
-        Evaluates a chromosome by simulating the execution of the tasks.
-
-        Args:
-            chromosome (list): A list representing the order of tasks to be executed.
-            tasks (list): A list of Task objects.
-
-        Returns:
-            tuple: A tuple containing the full time, final time, wait time, response time, and slack time.
-        """
-        # TODO: Implement the task execution simulation.
+    def migrate_schedule(self, elephant, other, tasks):
         pass
-
-    def selection(self, fitness_scores):
-        """
-        Selects two parent chromosomes using tournament selection.
-
-        Args:
-            fitness_scores (list): A list of tuples containing the chromosome and its fitness.
-
-        Returns:
-            tuple: A tuple containing the two parent chromosomes.
-        """
-        # TODO: Implement tournament selection.
-        pass
-
-    def crossover(self, parent1, parent2):
-        """
-        Performs crossover between two parent chromosomes.
-
-        Args:
-            parent1 (list): The first parent chromosome.
-            parent2 (list): The second parent chromosome.
-
-        Returns:
-            list: The child chromosome resulting from crossover.
-        """
-        # TODO: Implement crossover.
-        pass
-
-    def mutate(self, chromosome):
-        """
-        Mutates a chromosome.
-
-        Args:
-            chromosome (list): The chromosome to mutate.
-
-        Returns:
-            list: The mutated chromosome.
-        """
-        # TODO: Implement mutation.
-        pass
-
-    def evolve(self, population, fitness_scores):
-        """
-        Evolves the population by selecting parents, performing crossover and mutation, and generating a new population.
-
-        Args:
-            population (list): A list of task orders (chromosomes).
-            fitness_scores (list): A list of tuples containing the chromosome and its fitness.
-
-        Returns:
-            list: A new list of task orders (chromosomes).
-        """
-        # TODO: Implement evolution.
-        pass
-
     def run(self, tasks):
         """
-        Runs the GA
-
+        Runs the ESA
         """
+        best_schedule = self.population[0]
+        best_cost = self.calculate_cost(best_schedule, tasks)
 
-        pass
+        for i in range(self.n_iters):
+            # Random search phase
+            random_solutions = [self.generate_random_solution(self.n_tasks) for _ in range(self.n_r)]
+            for solution in random_solutions:
+                cost = self.calculate_cost(solution, tasks)
+                if cost < best_cost:
+                    best_schedule = solution
+                    best_cost = cost
+
+            # Mutation phase
+            for elephant in self.population:
+                new_schedule = self.mutate_schedule(elephant, tasks)
+                new_cost = self.calculate_cost(new_schedule, tasks)
+                if new_cost < best_cost:
+                    best_schedule = new_schedule
+                    best_cost = new_cost
+                if new_cost < self.calculate_cost(elephant, tasks):
+                    elephant = new_schedule
+
+            # Migration phase
+            for elephant in self.population:
+                for other in self.population:
+                    if elephant is not other:
+                        new_schedule = self.migrate_schedule(elephant, other, tasks)
+                        new_cost = self.calculate_cost(new_schedule, tasks)
+                        if new_cost < best_cost:
+                            best_schedule = new_schedule
+                            best_cost = new_cost
+                        if new_cost < self.calculate_cost(elephant, tasks):
+                            elephant = new_schedule
+
+        return best_schedule
+
+
+
+

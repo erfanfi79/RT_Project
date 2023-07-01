@@ -68,6 +68,12 @@ class Core:
         # Randomly initialize a solution (core assignment)
         return random.sample(self.assigned_tasks, len(self.assigned_tasks))
 
+def worst_fit(task_queue,num_cores):
+    cores = [[] for i in range(num_cores)]
+    for task in task_queue:
+        worst_core = max(cores, key=lambda core: sum([t.execution_time for t in core] + [task['execution_time']]))
+        worst_core.append(task)
+    return cores
 
 def main():
     # Example usage

@@ -153,4 +153,4 @@ def generate_tasks_instances(n, u_total, filename: str | None = None):
 
 if __name__ == '__main__':
     task_instances, hyper_period = generate_tasks_instances(n=2, u_total=1, filename=None)
-    print(len(task_instances))
+    print(len(task_instances), hyper_period)
