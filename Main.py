@@ -3,7 +3,7 @@ import enum
 from Task import Task
 from ElephantSearch import ESA_Scheduler
 from ArtificialBeeColony import ABC_Scheduler
-from Core import Core
+from Core import Core, assign_tasks, MappingType
 from task_generation import generate_tasks_instances
 
 
@@ -18,14 +18,16 @@ class SchedulingType(enum.Enum):
     ESA = "Elephant search algorithm"
 
 
-def assign_to_cores(cores, task_instances, assign_type):
-    pass
 
 
-def make_multicore_scheduling(num_cores, core_type, u_total, scheduling_type):
+def make_multicore_scheduling(num_cores, mapping_type, u_total, scheduling_type):
     cores = [Core(i) for i in range(num_cores)]
     task_instances, hyper_period = generate_tasks_instances(2, u_total=u_total)
-    assign_to_cores(cores, task_instances, core_type)
+    assign_tasks(cores, task_instances, hyper_period, mapping_type)
     if scheduling_type == SchedulingType.ABC:
         ABC = ABC_Scheduler()
         ABC.run()
+
+
+if __name__ == '__main__':
+    make_multicore_scheduling(5, MappingType.FIRST_FIT, 1, SchedulingType.ABC)

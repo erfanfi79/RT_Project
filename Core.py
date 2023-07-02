@@ -102,12 +102,7 @@ def main():
     hyper_period = max([task.deadline for task in tasks])
     mapping_type = MappingType.FIRST_FIT
 
-    if mapping_type == MappingType.FIRST_FIT:
-        assign_by_first_fit(cores, tasks, hyper_period)
-    elif mapping_type == MappingType.BEST_FIT:
-        assign_by_best_fit(cores, tasks, hyper_period)
-    elif mapping_type == MappingType.WORST_FIT:
-        assign_by_worst_fit(cores, tasks, hyper_period)
+    assign_tasks(cores, tasks, hyper_period, mapping_type)
 
     # Schedule tasks on each core using the Artificial Bee Colony algorithm
     for core in cores:
@@ -116,6 +111,15 @@ def main():
     # Print the assignments for each core
     for core in cores:
         print("Core", core.core_id, "assigned tasks:", [task.id for task in core.assigned_tasks])
+
+
+def assign_tasks(cores, tasks, hyper_period, mapping_type):
+    if mapping_type == MappingType.FIRST_FIT:
+        assign_by_first_fit(cores, tasks, hyper_period)
+    elif mapping_type == MappingType.BEST_FIT:
+        assign_by_best_fit(cores, tasks, hyper_period)
+    elif mapping_type == MappingType.WORST_FIT:
+        assign_by_worst_fit(cores, tasks, hyper_period)
 
 
 def assign_by_first_fit(cores, tasks, hyper_period):
