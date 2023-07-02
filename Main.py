@@ -23,8 +23,9 @@ def make_multicore_scheduling(num_cores, mapping_type, u_total, scheduling_type)
     task_instances, hyper_period = generate_tasks_instances(2, u_total=u_total)
     assign_tasks(cores, task_instances, hyper_period, mapping_type)
     if scheduling_type == SchedulingType.ABC:
-        ABC = ABC_Scheduler(len(task_instances), 10, 10, 10, 10)
-        ABC.run(task_instances)
+        for core in cores:
+            ABC = ABC_Scheduler(len(core.assigned_tasks), 10, 10, 10, 10)
+            ABC.run(core.assigned_tasks)
 
 
 if __name__ == '__main__':
