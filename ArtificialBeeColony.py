@@ -1,5 +1,6 @@
 import random
 
+from FitnessFunctions import min_completion_latency
 from Scheduler import Scheduler
 
 
@@ -15,41 +16,8 @@ class ABC_Scheduler:
         self.n_scout_bees = n_scout_bees
         self.n_iters = n_iters
 
-    def initialize_population(self, num_tasks):
-        """
-        Initializes the population with random task orders.
-
-        Args:
-            num_tasks (int): Number of tasks.
-
-        Returns:
-            list: A list of task orders (chromosomes).
-        """
-        population = []
-        for i in range(self.pop_size):
-            chromosome = [j for j in range(num_tasks)]
-            random.shuffle(chromosome)
-            population.append(chromosome)
-        return population
-
     def calculate_cost(self, schedule, task_list):
-        """ Calculate the cost of a schedule.
-
-        Args:
-            schedule (list): The schedule to evaluate, represented as a list of task IDs in the order they should be executed.
-            task_list (list): A list of tasks, where each task is represented as a tuple (p, d), where p is the processing time and d is the deadline.
-
-        Returns:
-            The cost of the schedule, calculated as the sum of the lateness costs of each task.
-        """
-        cost = 0
-        time = 0
-        for task_id in schedule:
-            p, d = task_list[task_id]
-            time += p
-            if time > d:
-                cost += time - d
-        return cost
+        return min_completion_latency(schedule,task_list)
 
     def crossover(self, schedule, task_list):
         """ Generate a new schedule by randomly swapping two tasks in the given schedule.
