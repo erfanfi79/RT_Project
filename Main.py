@@ -41,8 +41,10 @@ def make_multicore_scheduling(num_cores, mapping_type, u_total, scheduling_type)
 
             current_time += task.execution_time
 
-    print(task_instances[0])
+            if task.finish_time > task.deadline:
+                print(f"task {task_index} deadline missed. finish_time: {task.finish_time}, deadline: {task.deadline}")
+
 
 
 if __name__ == '__main__':
-    make_multicore_scheduling(2, MappingType.FIRST_FIT, 1, SchedulingType.ABC)
+    make_multicore_scheduling(2, MappingType.WORST_FIT, 1, SchedulingType.ABC)
