@@ -32,6 +32,9 @@ class ESA_Scheduler:
         return schedule
 
     def mutate_schedule(self, schedule, tasks):
+        if len(schedule) < 2:
+            return schedule
+
         new_schedule = schedule.copy()
         i, j = random.sample(range(len(schedule)), 2)
         new_schedule[i], new_schedule[j] = new_schedule[j], new_schedule[i]
