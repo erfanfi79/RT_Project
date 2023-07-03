@@ -25,10 +25,12 @@ def make_multicore_scheduling(num_cores, mapping_type, u_total, scheduling_type)
     schedules = []
     if scheduling_type == SchedulingType.ABC:
         for core in cores:
-            ABC = ESA_Scheduler(len(core.assigned_tasks), 10, 10, 10)
+            ABC = ABC_Scheduler(len(core.assigned_tasks), 100, 100, 100, 10)
             schedule = ABC.run(core.assigned_tasks)
             schedules.append(schedule)
 
+    for schedule in schedules:
+        print(schedule)
     for schedule in schedules:
         current_time = 0
         for task_index in schedule:
