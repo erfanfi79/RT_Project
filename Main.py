@@ -20,7 +20,7 @@ class SchedulingType(enum.Enum):
 
 def make_multicore_scheduling(num_cores, mapping_type, u_total, scheduling_type):
     cores = [Core(i) for i in range(num_cores)]
-    task_instances, hyper_period = generate_tasks_instances(2, u_total=u_total)
+    task_instances, hyper_period = generate_tasks_instances(n=2, u_total=u_total)
     assign_tasks(cores, task_instances, hyper_period, mapping_type)
     if scheduling_type == SchedulingType.ABC:
         for core in cores:

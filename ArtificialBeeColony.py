@@ -17,7 +17,7 @@ class ABC_Scheduler:
         self.n_iters = n_iters
 
     def calculate_cost(self, schedule, task_list):
-        return min_completion_latency(schedule,task_list)
+        return min_completion_latency(schedule, task_list)
 
     def crossover(self, schedule, task_list):
         """ Generate a new schedule by randomly swapping two tasks in the given schedule.
@@ -37,6 +37,9 @@ class ABC_Scheduler:
     def run(self, task_list):
         n_tasks = len(task_list)
         schedule = list(range(n_tasks))
+
+        if len(schedule) < 2:
+            return schedule
 
         best_schedule = schedule.copy()
         best_cost = self.calculate_cost(schedule, task_list)
