@@ -1,9 +1,8 @@
 import enum
 
-from Task import Task
-from ElephantSearch import ESA_Scheduler
 from ArtificialBeeColony import ABC_Scheduler
 from Core import Core, assign_tasks, MappingType
+from Output import generate_json_output
 from task_generation import generate_tasks_instances
 
 
@@ -20,12 +19,12 @@ class SchedulingType(enum.Enum):
 
 def make_multicore_scheduling(num_cores, mapping_type, u_total, scheduling_type):
     cores = [Core(i) for i in range(num_cores)]
-    task_instances, hyper_period = generate_tasks_instances(n=3, u_total=u_total)
+    task_instances, hyper_period = generate_tasks_instances(n=2, u_total=u_total)
     assign_tasks(cores, task_instances, hyper_period, mapping_type)
     schedules = []
     if scheduling_type == SchedulingType.ABC:
         for core in cores:
-            ABC = ABC_Scheduler(len(core.assigned_tasks), 50, 50, 50, 40)
+            ABC = ABC_Scheduler(len(core.assigned_tasks), 30, 30, 30, 40)
             schedule = ABC.run(core.assigned_tasks)
             schedules.append(schedule)
 
@@ -47,6 +46,13 @@ def make_multicore_scheduling(num_cores, mapping_type, u_total, scheduling_type)
             if task.finish_time > task.deadline:
                 print(f"task {task_index} deadline missed. finish_time: {task.finish_time}, deadline: {task.deadline}")
 
+    output = generate_json_output(cores=cores, algorithm_convergence_time=0)
+    write_output_to_file("./output.json")
+
+
+def write_output_to_file(filepath):
+    with open(filepath, 'w') as json_file:
+        json_file.write(filepath)
 
 
 if __name__ == '__main__':
