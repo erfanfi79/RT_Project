@@ -9,15 +9,13 @@ class ABC_Scheduler:
     A class representing the ABC algorithm for task scheduling.
     """
 
-    def __init__(self, n_tasks, n_employed_bees, n_onlooker_bees, n_scout_bees, n_iters):
+    def __init__(self, n_tasks, n_employed_bees, n_onlooker_bees, n_scout_bees, n_iters, cost_function):
         self.n_tasks = n_tasks
         self.n_employed_bees = n_employed_bees
         self.n_onlooker_bees = n_onlooker_bees
         self.n_scout_bees = n_scout_bees
         self.n_iters = n_iters
-
-    def calculate_cost(self, schedule, task_list):
-        return min_completion_latency(schedule, task_list)
+        self.cost_function = cost_function
 
     def crossover(self, schedule, task_list):
         """ Generate a new schedule by randomly swapping two tasks in the given schedule.
@@ -42,28 +40,28 @@ class ABC_Scheduler:
             return schedule
 
         best_schedule = schedule.copy()
-        best_cost = self.calculate_cost(schedule, task_list)
+        best_cost = self.cost_function(schedule, task_list)
 
         for i in range(self.n_iters):
             # Employed bees phase
             for j in range(self.n_employed_bees):
                 new_schedule = self.crossover(schedule, task_list)
-                new_cost = self.calculate_cost(new_schedule, task_list)
+                new_cost = self.cost_function(new_schedule, task_list)
                 if new_cost < best_cost:
                     best_schedule = new_schedule.copy()
                     best_cost = new_cost
-                if new_cost < self.calculate_cost(schedule, task_list):
+                if new_cost < self.cost_function(schedule, task_list):
                     schedule = new_schedule.copy()
 
             # Onlooker bees phase
             for j in range(self.n_onlooker_bees):
                 bee_schedule = self.crossover(schedule, task_list)
-                bee_cost = self.calculate_cost(bee_schedule, task_list)
+                bee_cost = self.cost_function(bee_schedule, task_list)
                 if random.uniform(0, 1) < (best_cost - bee_cost) / best_cost:
                     if bee_cost < best_cost:
                         best_schedule = bee_schedule.copy()
                         best_cost = bee_cost
-                    if bee_cost < self.calculate_cost(schedule, task_list):
+                    if bee_cost < self.cost_function(schedule, task_list):
                         schedule = bee_schedule.copy()
 
             # Scout bees phase

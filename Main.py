@@ -15,19 +15,19 @@ class SchedulingType(enum.Enum):
     ESA = "ESA"
 
 
-def make_multicore_scheduling(num_cores, mapping_type, u_total, scheduling_type):
+def make_multicore_scheduling(num_cores, mapping_type, u_total, scheduling_type, fitness_function):
     cores = [Core(i) for i in range(num_cores)]
     task_instances, hyper_period = read_task_instances_from_file('./task_instances_u_' + str(u_total) + '.json')
     assign_tasks(cores, task_instances, hyper_period, mapping_type)
     schedules = []
     if scheduling_type == SchedulingType.ABC:
         for core in cores:
-            ABC = ABC_Scheduler(len(core.assigned_tasks), 30, 30, 30, 40)
+            ABC = ABC_Scheduler(len(core.assigned_tasks), 30, 30, 30, 30, fitness_function)
             schedule = ABC.run(core.assigned_tasks)
             schedules.append(schedule)
     else:
         for core in cores:
-            ESA = ESA_Scheduler(len(core.assigned_tasks), 30, 40)
+            ESA = ESA_Scheduler(len(core.assigned_tasks), 30, 30, fitness_function)
             schedule = ESA.run(core.assigned_tasks)
             schedules.append(schedule)
 
@@ -56,27 +56,36 @@ def write_output_to_file(filepath, result):
 
 
 if __name__ == '__main__':
-    task_num = 2
+    task_num = 10
 
-    # fitness_functions = [min_completion_latency,min_wait_latency,mi]
+    fitness_functions = [min_completion_latency, min_response_wait, min_wait_latency, min_response_latency,
+                         min_completion_response, min_completion_sumOfSlack, min_completion_latency_response,
+                         min_completion_sumOfSlack_response]
+    fitness_functions_name = ['min_completion_latency', 'min_response_wait', 'min_wait_latency', 'min_response_latency',
+                              'min_completion_response', 'min_completion_sumOfSlack', 'min_completion_latency_response',
+                              'min_completion_sumOfSlack_response']
     multicore = [1, 2, 4, 8, 16, 32]
     mapping_type = [MappingType.FIRST_FIT, MappingType.WORST_FIT, MappingType.BEST_FIT]
     utilization = [0.1, 0.3, 0.5, 0.7, 0.9, 1]
     algorithm = [SchedulingType.ABC, SchedulingType.ESA]
-    output = []
     for u in utilization:
+        output = []
         create_tasks(task_num=task_num, u_total=u, filepath="task_instances_u_" + str(u) + ".json")
         for m in mapping_type:
             for a in algorithm:
+                print(u, m, a)
                 core_result = []
                 for c in multicore:
-                    r = make_multicore_scheduling(num_cores=c, mapping_type=m, u_total=u, scheduling_type=a)
-                    core_result.append({c: json.loads(r)})
+                    fitness_result = dict()
+                    for f in range(len(fitness_functions)):
+                        r = make_multicore_scheduling(num_cores=c, mapping_type=m, u_total=u, scheduling_type=a,
+                                                      fitness_function=fitness_functions[f])
+                        fitness_result[fitness_functions_name[f]] = r
+                    core_result.append({c: fitness_result})
                 output.append({
                     'utilization': u,
                     'mapping_type': m.name,
                     'algorithm': a.name,
                     'core_result': core_result
                 })
-    write_output_to_file("./output.json", json.dumps(output, indent=4))
-    plot_results(task_num, output)
+        write_output_to_file("./output_u_" + str(u) + ".json", json.dumps(output, indent=4))

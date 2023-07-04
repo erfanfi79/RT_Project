@@ -121,7 +121,7 @@ def generate_tasks(n, u_total, filename: str | None = None):
     periods = generate_random_periods_discrete(
         num_periods=n,
         num_sets=n_sets,
-        available_periods=[x for x in range(10, 101)],
+        available_periods=[x for x in range(10, 50, 10)],
         filename=None
     )
 

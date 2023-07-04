@@ -85,5 +85,5 @@ def generate_json_output(cores, algorithm_convergence_time=0):
         'totalSlackTime': calc_total_slack_time(cores),
         'slackBetweenTasks': generate_slack_between_tasks(cores)
     }
-
-    return json.dumps(output, indent=4)
+    return output
+    # return json.dumps(output, indent=4)

@@ -11,11 +11,12 @@ class ESA_Scheduler:
     A class representing the ESA algorithm for task scheduling.
     """
 
-    def __init__(self, n_tasks, n_elephants, n_iters):
+    def __init__(self, n_tasks, n_elephants, n_iters, cost_function):
         self.n_tasks = n_tasks
         self.n_elephants = n_elephants
         self.n_iters = n_iters
         self.population = np.array(self.initialize_population())
+        self.cost_function = cost_function
 
     def initialize_population(self):
         population = []
@@ -24,9 +25,6 @@ class ESA_Scheduler:
             random.shuffle(schedule)
             population.append(schedule)
         return population
-
-    def calculate_cost(self, schedule, task_list):
-        return min_completion_latency(schedule, task_list)
 
     def generate_random_solution(self, n_tasks):
         schedule = list(range(n_tasks))
@@ -41,12 +39,13 @@ class ESA_Scheduler:
             return []
 
         best_schedule = self.population[0]
-        best_cost = self.calculate_cost(best_schedule, tasks)
+        best_cost = self.cost_function(best_schedule, tasks)
 
         for i in range(self.n_iters):
-            pop_cost = np.array([self.calculate_cost(e, tasks) for e in self.population])
+            pop_cost = np.array([self.cost_function(e, tasks) for e in self.population])
             p = pop_cost / np.sum(pop_cost)
-
+            p = np.maximum(p, 0)
+            p = p / np.sum(p)
             # choosing leader
             leader = self.population[np.random.choice(self.n_elephants, p=p)]
             leader_distance = np.sqrt(np.sum((self.population - leader) ** 2, axis=1))
@@ -57,6 +56,6 @@ class ESA_Scheduler:
             self.population[last] = self.generate_random_solution(self.n_tasks)
             # update the best elephant (global best)
             best_schedule = self.population[
-                np.argmin([self.calculate_cost(elephant, tasks) for elephant in self.population])]
+                np.argmin([self.cost_function(elephant, tasks) for elephant in self.population])]
 
         return best_schedule

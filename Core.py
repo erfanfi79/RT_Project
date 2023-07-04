@@ -26,6 +26,7 @@ class Core:
         busy_time = sum([min(o_task.execution_time, o_task.deadline - current_time) for o_task in overlapping_tasks])
         return end_time - current_time - busy_time
 
+
 def assign_tasks(cores, tasks, hyper_period, mapping_type):
     if mapping_type == MappingType.FIRST_FIT:
         first_fit(cores, tasks, hyper_period)
@@ -33,5 +34,3 @@ def assign_tasks(cores, tasks, hyper_period, mapping_type):
         best_fit(cores, tasks, hyper_period)
     elif mapping_type == MappingType.WORST_FIT:
         worst_fit(cores, tasks, hyper_period)
-
-
