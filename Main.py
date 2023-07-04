@@ -20,21 +20,22 @@ class SchedulingType(enum.Enum):
 
 def make_multicore_scheduling(num_cores, mapping_type, u_total, scheduling_type):
     cores = [Core(i) for i in range(num_cores)]
-    task_instances, hyper_period = generate_tasks_instances(n=2, u_total=u_total)
+    task_instances, hyper_period = generate_tasks_instances(n=3, u_total=u_total)
     assign_tasks(cores, task_instances, hyper_period, mapping_type)
     schedules = []
     if scheduling_type == SchedulingType.ABC:
         for core in cores:
-            ABC = ABC_Scheduler(len(core.assigned_tasks), 100, 100, 100, 10)
+            ABC = ABC_Scheduler(len(core.assigned_tasks), 50, 50, 50, 40)
             schedule = ABC.run(core.assigned_tasks)
             schedules.append(schedule)
 
-    for schedule in schedules:
-        print(schedule)
-    for schedule in schedules:
+    for idx, schedule in enumerate(schedules):
+        print([cores[idx].assigned_tasks[task_idx].id for task_idx in schedule])
+
+    for core_idx, schedule in enumerate(schedules):
         current_time = 0
         for task_index in schedule:
-            task = task_instances[task_index]
+            task = cores[core_idx].assigned_tasks[task_index]
             task.start_time = current_time
             task.finish_time = current_time + task.execution_time
             task.waiting_time = task.finish_time - task.execution_time - task.arrival_time
