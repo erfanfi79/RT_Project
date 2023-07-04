@@ -27,8 +27,9 @@ def make_multicore_scheduling(num_cores, mapping_type, u_total, scheduling_type)
             schedules.append(schedule)
     else:
         for core in cores:
-            # ESA = ESA_Scheduler(len(core.assigned_tasks),)
-            pass
+            ESA = ESA_Scheduler(len(core.assigned_tasks), 30, 40)
+            schedule = ESA.run(core.assigned_tasks)
+            schedules.append(schedule)
 
     for core_idx, schedule in enumerate(schedules):
         current_time = 0
@@ -61,7 +62,7 @@ if __name__ == '__main__':
     multicore = [1, 2, 4, 8, 16, 32]
     mapping_type = [MappingType.FIRST_FIT, MappingType.WORST_FIT, MappingType.BEST_FIT]
     utilization = [0.1, 0.3, 0.5, 0.7, 0.9, 1]
-    algorithm = [SchedulingType.ABC]
+    algorithm = [SchedulingType.ABC, SchedulingType.ESA]
     output = []
     for u in utilization:
         create_tasks(task_num=task_num, u_total=u, filepath="task_instances_u_" + str(u) + ".json")
