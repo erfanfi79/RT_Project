@@ -6,7 +6,6 @@ from Core import Core, assign_tasks, MappingType
 from ElephantSearch import ESA_Scheduler
 from FitnessFunctions import *
 from Output import generate_json_output
-from Visulization import plot_results
 from task_generation import read_task_instances_from_file, create_tasks
 
 

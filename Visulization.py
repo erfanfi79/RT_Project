@@ -4,11 +4,12 @@ from matplotlib import pyplot as plt
 
 from Core import MappingType
 from Main import SchedulingType
+import math
 
 multicore = [1, 2, 4, 8, 16, 32]
-mapping_type = [MappingType.FIRST_FIT, MappingType.WORST_FIT, MappingType.BEST_FIT]
+mapping_types = [MappingType.FIRST_FIT, MappingType.WORST_FIT, MappingType.BEST_FIT]
 utilization = [0.1, 0.3, 0.5, 0.7, 0.9, 1]
-algorithm = [SchedulingType.ABC, SchedulingType.ESA]
+algorithms = [SchedulingType.ABC, SchedulingType.ESA]
 fitness_functions = ['min_completion_latency', 'min_response_wait', 'min_wait_latency', 'min_response_latency',
                      'min_completion_response', 'min_completion_sumOfSlack', 'min_completion_latency_response',
                      'min_completion_sumOfSlack_response']
@@ -24,27 +25,49 @@ def read_result_from_file(filepath):
         return t
 
 
-def plot_cores_avgCompletionTime(u, scheduling_t):
-    r = read_result_from_file('output_u_' + str(u) + '.json')
+def plot_cores_avgCompletionTime(u):
+    output = read_result_from_file('./Results/output_u_' + str(u) + '.json')
 
-    for i in r:
-        if i[algorithm]==scheduling_t.value:
-            pass
-    # Average completion time for different numbers of cores
     cores = [1, 2, 4, 8, 16, 32]
-    completion_time = [10.2, 8.5, 6.9, 5.6, 4.8, 4.2]  # Replace with your actual data
 
-    # Plotting the average completion time
-    plt.plot(cores, completion_time, marker='o')
+    # List of fitness functions
+    for mapping_type in mapping_types:
+        for algorithm in algorithms:
+            selected_result = None
+            for result in output:
+                if result['mapping_type'] == mapping_type.name and result['algorithm'] == algorithm.name:
+                    selected_result = result
+                    break
 
-    # Set the axis labels and title
-    plt.xlabel('Number of Cores')
-    plt.ylabel('Average Completion Time')
-    plt.title('Average Completion Time for Different Numbers of Cores')
+            completion_times = [[0 for i in range(len(cores))] for j in range(len(fitness_functions))]
+            for f_fun in fitness_functions:
+                for key, core_result in enumerate(selected_result['core_result']):
+                    core_count = int(list(core_result.keys())[0])
+                    f_index = fitness_functions.index(f_fun)
+                    core_index = int(math.log2(core_count))
+                    completion_times[f_index][core_index] = core_result[str(core_count)][f_fun]['avgCompletionTime']
 
-    # Show the gridlines
-    plt.grid(True)
+            # Create a figure and axes
+            fig, ax = plt.subplots(figsize=(10, 6))
+
+            # Plotting the completion time for each fitness function
+            for i in range(len(fitness_functions)):
+                ax.plot(cores, completion_times[i], marker='o', label=fitness_functions[i])
+
+            # Set the axis labels and title
+            ax.set_xlabel('Number of Cores')
+            ax.set_ylabel('Completion Time')
+            ax.set_title('Completion Time for Different Fitness Functions')
+
+            # Show the gridlines
+            ax.grid(True)
+
+            # Add a legend
+            ax.legend()
+            plt.title(f"{algorithm.name}-{mapping_type.name}")
+            # Display the plot
+            plt.savefig(f"./{algorithm.name}-{mapping_type.name}-{u}.png")
 
 
 if __name__ == '__main__':
-    pass
+    plot_cores_avgCompletionTime(0.1)
