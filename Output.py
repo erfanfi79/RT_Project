@@ -4,8 +4,9 @@ import json
 def calc_completion_time(cores):
     max_completion_time = 0
     for core in cores:
-        core_max_finish_time = max([task.finish_time for task in core.assigned_tasks])
-        max_completion_time = max(max_completion_time, core_max_finish_time)
+        if len(core.assigned_tasks) > 0:
+            core_max_finish_time = max([task.finish_time for task in core.assigned_tasks])
+            max_completion_time = max(max_completion_time, core_max_finish_time)
     return max_completion_time
 
 
@@ -71,7 +72,6 @@ def generate_slack_between_tasks(cores):
             slack_between_tasks[f"{prev_task.id}#{task.id}"] = task.start_time - prev_task.finish_time
 
     return slack_between_tasks
-
 
 def generate_json_output(cores, algorithm_convergence_time=0):
     output = {

@@ -1,4 +1,6 @@
 import csv
+import json
+
 import numpy as np
 import random
 import math
@@ -151,6 +153,29 @@ def generate_tasks_instances(n, u_total, filename: str | None = None):
     return instances, hyper_period
 
 
-if __name__ == '__main__':
-    task_instances, hyper_period = generate_tasks_instances(n=2, u_total=1, filename=None)
-    print(len(task_instances), hyper_period)
+def write_task_instances_to_file(task_instances, hyper_period, filepath):
+    t = {'task_instances': [
+        {'deadline': t.deadline, 'arrival_time': t.arrival_time, 'execution_time': t.execution_time, 'id': t.id} for t
+        in task_instances], 'hyper_period': hyper_period}
+    with open(filepath, 'w') as json_file:
+        json_file.write(json.dumps(t, indent=4))
+
+
+def read_task_instances_from_file(filepath):
+    with open(filepath, 'r') as json_file:
+        t = json.loads(json_file.read())
+        task_instances = []
+        instances = t['task_instances']
+        hyper_period = t['hyper_period']
+        for i in instances:
+            task_instances.append(Task(id=i['id'],
+                                       arrival_time=i['arrival_time'],
+                                       deadline=i['deadline'],
+                                       execution_time=i['execution_time']))
+
+        return task_instances, hyper_period
+
+
+def create_tasks(task_num, u_total, filepath):
+    task_instances, hyper_period = generate_tasks_instances(n=task_num, u_total=u_total, filename=None)
+    write_task_instances_to_file(task_instances, hyper_period, filepath)
