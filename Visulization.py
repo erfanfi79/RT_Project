@@ -8,7 +8,7 @@ import math
 
 multicore = [1, 2, 4, 8, 16, 32]
 mapping_types = [MappingType.FIRST_FIT, MappingType.WORST_FIT, MappingType.BEST_FIT]
-utilization = [0.1, 0.3, 0.5, 0.7, 0.9, 1]
+utilizations = [0.1, 0.3, 0.5, 0.7, 0.9, 1]
 algorithms = [SchedulingType.ABC, SchedulingType.ESA]
 fitness_functions = ['min_completion_latency', 'min_response_wait', 'min_wait_latency', 'min_response_latency',
                      'min_completion_response', 'min_completion_sumOfSlack', 'min_completion_latency_response',
@@ -66,8 +66,9 @@ def plot_cores_avgCompletionTime(u):
             ax.legend()
             plt.title(f"{algorithm.name}-{mapping_type.name}")
             # Display the plot
-            plt.savefig(f"./{algorithm.name}-{mapping_type.name}-{u}.png")
+            plt.savefig(f"./plots/{algorithm.name}-{mapping_type.name}-{u}.png")
 
 
 if __name__ == '__main__':
-    plot_cores_avgCompletionTime(0.1)
+    for utilization in utilizations:
+        plot_cores_avgCompletionTime(utilization)
