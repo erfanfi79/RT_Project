@@ -9,7 +9,7 @@ def min_completion_latency(schedule, tasks):
         if task_latency > 0:
             time -= task_latency
     completion_time = time
-    fitness_score = 1 / (0.6 * completion_time + 0.4 * latency)
+    fitness_score = (0.2 * completion_time + 0.8 * latency)
     return fitness_score
 
 
@@ -23,7 +23,7 @@ def min_response_wait(schedule, tasks):
         wait_time += task.get_wait_time(time)
         time += task.execution_time
 
-    fitness_score = 1 / (0.6 * response_time + 0.4 * wait_time)
+    fitness_score = (0.6 * response_time + 0.4 * wait_time)
     return fitness_score
 
 
@@ -36,7 +36,7 @@ def min_wait_latency(schedule, tasks):
         latency += task.get_latency(time)
         wait_time += task.get_wait_time(time)
         time += task.execution_time
-    fitness_score = 1 / (0.6 * wait_time + 0.4 * latency)
+    fitness_score = (0.6 * wait_time + 0.4 * latency)
     return fitness_score
 
 
@@ -49,7 +49,7 @@ def min_response_latency(schedule, tasks):
         latency += task.get_latency(time)
         response_time += task.get_response_time(time)
         time += task.execution_time
-    fitness_score = 1 / (0.7 * response_time + 0.3 * latency)
+    fitness_score = (0.7 * response_time + 0.3 * latency)
     return fitness_score
 
 
@@ -64,7 +64,7 @@ def min_completion_response(schedule, tasks):
         if task_latency > 0:
             time -= task_latency
     completion_time = time
-    fitness_score = 1 / (0.6 * completion_time + 0.4 * response_time)
+    fitness_score = (0.6 * completion_time + 0.4 * response_time)
     return fitness_score
 
 
@@ -79,7 +79,7 @@ def min_completion_sumOfSlack(schedule, tasks):
         if task_latency > 0:
             time -= task_latency
     completion_time = time
-    fitness_score = 1 / (0.6 * completion_time + 0.4 * sumOfSlack)
+    fitness_score = (0.6 * completion_time + 0.4 * sumOfSlack)
     return fitness_score
 
 
@@ -96,7 +96,7 @@ def min_completion_latency_response(schedule, tasks):
         if task_latency > 0:
             time -= task_latency
     completion_time = time
-    fitness_score = 1 / (0.3 * latency + 0.3 * completion_time + 0.5 * response_time)
+    fitness_score = (0.3 * latency + 0.3 * completion_time + 0.5 * response_time)
     return fitness_score
 
 
@@ -113,5 +113,5 @@ def min_completion_sumOfSlack_response(schedule, tasks):
         if task_latency > 0:
             time -= task_latency
     completion_time = time
-    fitness_score = 1 / (0.3 * response_time + 0.3 * completion_time + 0.5 * response_time)
+    fitness_score = (0.3 * response_time + 0.3 * completion_time + 0.5 * response_time)
     return fitness_score

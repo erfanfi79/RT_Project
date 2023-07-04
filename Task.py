@@ -29,3 +29,6 @@ class Task:
 
     def get_latency(self, start_time):
         return self.get_completion_time(start_time) - self.deadline
+
+    def __repr__(self):
+        return "(" + str(self.execution_time) + "," + str(self.deadline - self.arrival_time) + ")"
